@@ -6,7 +6,7 @@ const { ccclass, property } = _decorator;
 export class HeatTool extends Component {
 
     @property([Node])
-    eggs: Node[] = []; // Drag all 3 Egg nodes here
+    eggs: Node[] = [];  
 
     private isDragging: boolean = false;
 
@@ -29,8 +29,8 @@ export class HeatTool extends Component {
                 const eggPos = eggNode.getWorldPosition();
                 const dist = Vec3.distance(lampPos, eggPos);
 
-                // If lamp is close (e.g. 150 pixels), warm the egg
-                if (dist < 150) {
+                // If lamp is close (e.g. 250 pixels), warm the egg
+                if (dist < 250) {
                     eggScript.addWarmth();
                 }
             }

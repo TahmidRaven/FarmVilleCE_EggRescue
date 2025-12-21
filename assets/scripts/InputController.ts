@@ -18,26 +18,19 @@ export class InputController extends Component {
     }
 
     onTouch(event: EventTouch) {
-        // Get touch location in UI space
         const touchUILocation = event.getUILocation();
         
-        // Convert to Node Space of the debris container
         const uiTransform = this.debrisContainer.getComponent(UITransform);
         const localPos = uiTransform.convertToNodeSpaceAR(new Vec3(touchUILocation.x, touchUILocation.y, 0));
 
-        // Simple Distance Check (Efficient for Playable Ads)
-        // Check all children to see if we touched them
+
         this.debrisContainer.children.forEach(child => {
             const debrisScript = child.getComponent(Debris);
             if (debrisScript && !debrisScript.isCleaned) {
                 
-                // Check if touch is inside the bounding box (approximated)
                 const boundingBox = child.getComponent(UITransform).getBoundingBox();
-                // We need to adjust bounding box to local coordinates relative to the child's position
-                // Alternatively, simply check distance for "Brush" feel
                 const dist = Vec3.distance(child.position, localPos);
                 
-                // If close enough (e.g., radius of 50px), clean it!
                 if (dist < 80) { 
                     debrisScript.clean();
                 }
