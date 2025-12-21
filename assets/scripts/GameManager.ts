@@ -4,24 +4,38 @@ const { ccclass, property } = _decorator;
 @ccclass('GameManager')
 export class GameManager extends Component {
 
+    // --- STEP 1: CLEANING ---
     @property(Node)
     debrisContainer: Node = null!;
 
-    @property(Node)
-    step2ToolsNode: Node = null!; // Drag "Step2_Tools" here
-
     private totalDebris: number = 0;
 
-    start() {
-        // Count Debris
-        this.totalDebris = this.debrisContainer.children.length;
+    // --- STEP 2: REPAIR ---
+    @property(Node)
+    step2ToolsNode: Node = null!; 
 
-        // Listen for cleaning
-        this.debrisContainer.children.forEach(child => {
+    private fixedPieces: number = 0;
+    private totalPiecesToFix: number = 3; 
+
+    // --- STEP 3: WARMING ---
+    @property(Node)
+    step3ToolsNode: Node = null!; 
+
+    start() {
+        // --- SETUP STEP 1 ---
+        this.totalDebris = this.debrisContainer.children.length;
+        console.log(`Game Start: ${this.totalDebris} debris items to clean.`);
+
+        this.debrisContainer.children.forEach((child: Node) => {
             child.on('debris-cleaned', this.onDebrisCleaned, this);
         });
+
+        // Ensure later steps are hidden at start
+        if (this.step2ToolsNode) this.step2ToolsNode.active = false;
+        if (this.step3ToolsNode) this.step3ToolsNode.active = false;
     }
 
+    // --- STEP 1 LOGIC ---
     onDebrisCleaned() {
         this.totalDebris--;
         if (this.totalDebris <= 0) {
@@ -29,12 +43,36 @@ export class GameManager extends Component {
         }
     }
 
+    // --- STEP 2 LOGIC ---
     startStep2() {
-        console.log("Step 1 Complete! Starting Step 2...");
+        console.log("Step 1 Complete! Starting Step 2 (Repair)...");
         
-        // Reveal the Repair Tools
         if (this.step2ToolsNode) {
             this.step2ToolsNode.active = true;
+
+            this.step2ToolsNode.children.forEach((tool: Node) => {
+                tool.on('piece-fixed', this.onPieceFixed, this);
+            });
+        }
+    }
+
+    onPieceFixed() {
+        this.fixedPieces++;
+        console.log(`Piece Fixed: ${this.fixedPieces}/${this.totalPiecesToFix}`);
+
+        if (this.fixedPieces >= this.totalPiecesToFix) {
+            this.startStep3();
+        }
+    }
+
+    // --- STEP 3 LOGIC ---
+    startStep3() {
+        console.log("Step 2 Complete! Starting Step 3 (Warm)...");
+
+        if (this.step2ToolsNode) this.step2ToolsNode.active = false;
+        
+        if (this.step3ToolsNode) {
+            this.step3ToolsNode.active = true;
         }
     }
 }

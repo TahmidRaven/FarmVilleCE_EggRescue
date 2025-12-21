@@ -47,29 +47,32 @@ export class Egg extends Component {
             .start();
     }
 
-    hatch() {
+hatch() {
         this.isHatched = true;
         
-        // Pop effect
+        // Pop effect (Squish)
         tween(this.node)
-            .to(0.1, { scale: new Vec3(1.2, 0.8, 1) }) // Squish
-            .to(0.1, { scale: new Vec3(0, 0, 0) })     // Disappear
+            .to(0.1, { scale: new Vec3(1.2, 0.8, 1) }) // Squish down
+            .to(0.1, { scale: new Vec3(0.1, 0.1, 1) }) // Shrink almost to nothing
             .call(() => {
-                // Hide Egg
+                // 1. Hide the Egg Shell (Sprite) ONLY
                 const sprite = this.node.getComponent(Sprite);
                 if (sprite) sprite.enabled = false;
                 
-                // Show Chick
+                // 2. IMPORTANT: Reset the container scale to 1 so the Chick can be seen!
+                this.node.setScale(new Vec3(1, 1, 1));
+
+                // 3. Show Chick
                 if (this.chickVisual) {
                     this.chickVisual.active = true;
-                    this.chickVisual.setScale(0, 0, 1);
+                    this.chickVisual.setScale(0, 0, 1); // Start chick at 0
+                    
                     // Pop Chick out
                     tween(this.chickVisual)
                         .to(0.5, { scale: new Vec3(1, 1, 1) }, { easing: 'elasticOut' })
                         .start();
                 }
 
-                // Notify Game Manager (We will add this event later)
                 this.node.emit('egg-hatched');
             })
             .start();
